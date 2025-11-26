@@ -282,7 +282,7 @@
 @media print {
   @page {
     size: letter; /* 8.5" x 11" */
-    margin: 0.5in; /* Standard letter margins */
+    margin: 0.15in; /* Reduced margins to maximize content area */
   }
   
   body {
@@ -292,6 +292,7 @@
     margin: 0 !important;
     padding: 0 !important;
     width: 100%;
+    max-width: 100% !important;
   }
   
   /* Remove background gradients and colors */
@@ -342,16 +343,17 @@
     animation: none !important;
   }
   
-  /* Optimize letter layout for single page - Letter size content area is 7.5" x 10" with 0.5" margins */
+  /* Optimize letter layout for single page - Letter size content area maximized */
   #letter-to-print {
     max-width: 100% !important;
     width: 100% !important;
-    margin: 0 !important;
-    padding: 0.75rem !important; /* Reduced padding to fit on one page */
+    margin: 0 auto !important;
+    padding: 0.2rem !important; /* Minimal padding to maximize content area */
     page-break-inside: avoid;
     page-break-after: avoid;
     background: white !important;
     box-sizing: border-box !important;
+    transform: scale(1) !important; /* Ensure no scaling issues on mobile */
   }
   
   /* Ensure clean white background everywhere */
@@ -365,48 +367,62 @@
     background: white !important;
   }
   
+  /* Mobile-specific print optimizations */
+  html {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+  
+  /* Prevent mobile browsers from adding extra margins */
+  html, body, main, #__next {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+  
   /* Compact padding for print */
   .print\:p-3 {
-    padding: 0.4rem !important;
+    padding: 0.2rem !important;
   }
   
   .print\:px-6 {
-    padding-left: 0.75rem !important;
-    padding-right: 0.75rem !important;
+    padding-left: 0.3rem !important;
+    padding-right: 0.3rem !important;
   }
   
   .print\:py-2 {
-    padding-top: 0.25rem !important;
-    padding-bottom: 0.25rem !important;
+    padding-top: 0.1rem !important;
+    padding-bottom: 0.1rem !important;
   }
   
   /* Compact margins for print */
   .print\:mb-3 {
-    margin-bottom: 0.35rem !important;
+    margin-bottom: 0.2rem !important;
   }
   
   .print\:mb-2 {
-    margin-bottom: 0.25rem !important;
-  }
-  
-  .print\:mb-1 {
     margin-bottom: 0.15rem !important;
   }
   
+  .print\:mb-1 {
+    margin-bottom: 0.08rem !important;
+  }
+  
   .print\:mb-0\.5 {
-    margin-bottom: 0.1rem !important;
+    margin-bottom: 0.05rem !important;
   }
   
   .print\:mt-2 {
-    margin-top: 0.25rem !important;
+    margin-top: 0.15rem !important;
   }
   
   .print\:mt-1\.5 {
-    margin-top: 0.2rem !important;
+    margin-top: 0.1rem !important;
   }
   
   .print\:mt-1 {
-    margin-top: 0.15rem !important;
+    margin-top: 0.08rem !important;
   }
   
   /* Compact spacing for print */
@@ -415,40 +431,59 @@
   }
   
   .print\:space-y-0\.5 > * + * {
-    margin-top: 0.1rem !important;
+    margin-top: 0.05rem !important;
   }
   
   .print\:space-y-1 > * + * {
-    margin-top: 0.15rem !important;
+    margin-top: 0.08rem !important;
   }
   
   .print\:gap-2 {
-    gap: 0.3rem !important;
+    gap: 0.15rem !important;
   }
   
-  /* Optimized font sizes for print */
+  /* Optimized font sizes for print - compact to fit more content */
+  .print\:text-4xl {
+    font-size: 1.4rem !important;
+    line-height: 1.6rem !important;
+  }
+  
   .print\:text-3xl {
-    font-size: 1.5rem !important;
-    line-height: 1.75rem !important;
+    font-size: 1.3rem !important;
+    line-height: 1.5rem !important;
   }
   
-  .print\:text-sm {
-    font-size: 0.8rem !important;
+  .print\:text-xl {
+    font-size: 0.95rem !important;
+    line-height: 1.15rem !important;
+  }
+  
+  .print\:text-lg {
+    font-size: 0.85rem !important;
     line-height: 1.1rem !important;
   }
   
-  .print\:text-xs {
+  .print\:text-sm {
     font-size: 0.7rem !important;
     line-height: 0.95rem !important;
   }
   
+  .print\:text-xs {
+    font-size: 0.65rem !important;
+    line-height: 0.85rem !important;
+  }
+  
   .print\:text-base {
-    font-size: 0.875rem !important;
-    line-height: 1.2rem !important;
+    font-size: 0.75rem !important;
+    line-height: 1rem !important;
+  }
+  
+  .print\:leading-relaxed {
+    line-height: 1.4 !important;
   }
   
   .print\:leading-snug {
-    line-height: 1.25 !important;
+    line-height: 1.2 !important;
   }
   
   /* Icon and image sizes for print */
