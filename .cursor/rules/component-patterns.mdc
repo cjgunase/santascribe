@@ -1,0 +1,80 @@
+---
+globs: src/components/**/*.tsx,src/app/**/*.tsx
+---
+# Component Development Patterns
+
+## shadcn/ui Component Usage
+
+When creating new components in this project:
+
+### 1. Import from Aliases
+
+Always use the configured path aliases:
+```typescript
+import { Button } from "@/ui/button"
+import { cn } from "@/lib/utils"
+```
+
+### 2. Component Composition
+
+Build features by composing shadcn/ui primitives:
+```typescript
+import { Card, CardContent, CardHeader, CardTitle } from "@/ui/card"
+import { Button } from "@/ui/button"
+
+export function FeatureCard({ title, children }: Props) {
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>{title}</CardTitle>
+      </CardHeader>
+      <CardContent>
+        {children}
+        <Button>Action</Button>
+      </CardContent>
+    </Card>
+  )
+}
+```
+
+### 3. Styling with cn()
+
+Use the `cn()` utility for conditional styling:
+```typescript
+import { cn } from "@/lib/utils"
+
+<Button 
+  className={cn(
+    "custom-class",
+    isActive && "bg-primary",
+    isDisabled && "opacity-50"
+  )}
+>
+  Label
+</Button>
+```
+
+### 4. Component Variants
+
+Leverage built-in variants from shadcn/ui components:
+```typescript
+<Button variant="default">Default</Button>
+<Button variant="destructive">Delete</Button>
+<Button variant="outline">Outline</Button>
+<Button variant="ghost">Ghost</Button>
+<Button variant="link">Link</Button>
+```
+
+### 5. Server vs Client Components
+
+- Use React Server Components by default
+- Add `"use client"` only when needed (state, effects, browser APIs, event handlers)
+- shadcn/ui components that require interactivity already have `"use client"` directive
+
+## Best Practices
+
+1. **Don't recreate existing shadcn/ui components** - check the available components first
+2. **Extend, don't modify** - wrap shadcn/ui components rather than editing them
+3. **Keep components focused** - single responsibility principle
+4. **Use TypeScript** - leverage type safety for props and variants
+5. **Accessibility first** - shadcn/ui components are accessible by default, maintain this

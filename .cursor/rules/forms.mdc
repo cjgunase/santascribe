@@ -1,0 +1,124 @@
+---
+description: Guidelines for building forms with shadcn/ui components
+---
+# Form Development Guidelines
+
+## Form Components
+
+When building forms, use shadcn/ui form components for consistency and accessibility.
+
+### Available Form Components
+
+Currently installed:
+- [Input](mdc:src/components/ui/input.tsx)
+- [Button](mdc:src/components/ui/button.tsx)
+
+### Adding More Form Components
+
+Install additional form components as needed:
+```bash
+npx shadcn@latest add form
+npx shadcn@latest add label
+npx shadcn@latest add textarea
+npx shadcn@latest add select
+npx shadcn@latest add checkbox
+npx shadcn@latest add radio-group
+npx shadcn@latest add switch
+```
+
+### Form with React Hook Form
+
+For complex forms, use React Hook Form with Zod validation:
+
+1. Install dependencies:
+```bash
+npm install react-hook-form @hookform/resolvers zod
+```
+
+2. Add the form component:
+```bash
+npx shadcn@latest add form
+```
+
+3. Example form pattern:
+```typescript
+"use client"
+
+import { zodResolver } from "@hookform/resolvers/zod"
+import { useForm } from "react-hook-form"
+import * as z from "zod"
+import { Button } from "@/ui/button"
+import { Input } from "@/ui/input"
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/ui/form"
+
+const formSchema = z.object({
+  username: z.string().min(2).max(50),
+})
+
+export function MyForm() {
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      username: "",
+    },
+  })
+
+  function onSubmit(values: z.infer<typeof formSchema>) {
+    console.log(values)
+  }
+
+  return (
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+        <FormField
+          control={form.control}
+          name="username"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Username</FormLabel>
+              <FormControl>
+                <Input placeholder="shadcn" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <Button type="submit">Submit</Button>
+      </form>
+    </Form>
+  )
+}
+```
+
+### Simple Forms
+
+For simple forms without validation:
+```typescript
+import { Input } from "@/ui/input"
+import { Button } from "@/ui/button"
+
+export function SimpleForm() {
+  return (
+    <form className="space-y-4">
+      <Input type="email" placeholder="Email" />
+      <Input type="password" placeholder="Password" />
+      <Button type="submit">Sign In</Button>
+    </form>
+  )
+}
+```
+
+## Best Practices
+
+1. **Use React Hook Form + Zod** for forms with validation
+2. **Keep forms accessible** - use proper labels and ARIA attributes
+3. **Provide clear error messages** using FormMessage
+4. **Handle loading states** on submit buttons
+5. **Follow shadcn/ui form patterns** for consistency

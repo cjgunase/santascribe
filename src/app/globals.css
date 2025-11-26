@@ -1,26 +1,451 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+@custom-variant dark (&:is(.dark *));
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: 'Kalam', cursive;
+  --font-mono: 'Courier New', monospace;
+  --font-christmas: 'Mountains of Christmas', cursive;
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+:root {
+  --radius: 0.75rem;
+  /* Christmas Color Palette */
+  --christmas-red: 0 72% 51%; /* #C41E3A - Classic Christmas Red */
+  --christmas-green: 120 48% 28%; /* #276749 - Deep Forest Green */
+  --christmas-gold: 43 96% 56%; /* #FFD700 - Gold */
+  --christmas-white: 0 0% 98%; /* #FAFAFA - Snow White */
+  --christmas-cream: 40 67% 94%; /* #FDF6E3 - Warm Cream */
+  --christmas-dark-green: 140 60% 20%; /* #145A32 - Dark Pine Green */
+  
+  /* Theme Colors with Christmas Theme */
+  --background: var(--christmas-cream);
+  --foreground: var(--christmas-dark-green);
+  --card: var(--christmas-white);
+  --card-foreground: var(--christmas-dark-green);
+  --popover: var(--christmas-white);
+  --popover-foreground: var(--christmas-dark-green);
+  --primary: var(--christmas-red);
+  --primary-foreground: var(--christmas-white);
+  --secondary: var(--christmas-green);
+  --secondary-foreground: var(--christmas-white);
+  --muted: 40 30% 90%;
+  --muted-foreground: 140 30% 35%;
+  --accent: var(--christmas-gold);
+  --accent-foreground: var(--christmas-dark-green);
+  --destructive: 0 84% 60%;
+  --border: 40 20% 85%;
+  --input: 40 20% 85%;
+  --ring: var(--christmas-red);
+  --chart-1: var(--christmas-red);
+  --chart-2: var(--christmas-green);
+  --chart-3: var(--christmas-gold);
+  --chart-4: 340 82% 52%;
+  --chart-5: 160 60% 45%;
+  --sidebar: var(--christmas-white);
+  --sidebar-foreground: var(--christmas-dark-green);
+  --sidebar-primary: var(--christmas-red);
+  --sidebar-primary-foreground: var(--christmas-white);
+  --sidebar-accent: 40 30% 90%;
+  --sidebar-accent-foreground: var(--christmas-dark-green);
+  --sidebar-border: 40 20% 85%;
+  --sidebar-ring: var(--christmas-red);
+}
+
+.dark {
+  --background: oklch(0.13 0.028 261.692);
+  --foreground: oklch(0.985 0.002 247.839);
+  --card: oklch(0.21 0.034 264.665);
+  --card-foreground: oklch(0.985 0.002 247.839);
+  --popover: oklch(0.21 0.034 264.665);
+  --popover-foreground: oklch(0.985 0.002 247.839);
+  --primary: oklch(0.928 0.006 264.531);
+  --primary-foreground: oklch(0.21 0.034 264.665);
+  --secondary: oklch(0.278 0.033 256.848);
+  --secondary-foreground: oklch(0.985 0.002 247.839);
+  --muted: oklch(0.278 0.033 256.848);
+  --muted-foreground: oklch(0.707 0.022 261.325);
+  --accent: oklch(0.278 0.033 256.848);
+  --accent-foreground: oklch(0.985 0.002 247.839);
+  --destructive: oklch(0.704 0.191 22.216);
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 15%);
+  --ring: oklch(0.551 0.027 264.364);
+  --chart-1: oklch(0.488 0.243 264.376);
+  --chart-2: oklch(0.696 0.17 162.48);
+  --chart-3: oklch(0.769 0.188 70.08);
+  --chart-4: oklch(0.627 0.265 303.9);
+  --chart-5: oklch(0.645 0.246 16.439);
+  --sidebar: oklch(0.21 0.034 264.665);
+  --sidebar-foreground: oklch(0.985 0.002 247.839);
+  --sidebar-primary: oklch(0.488 0.243 264.376);
+  --sidebar-primary-foreground: oklch(0.985 0.002 247.839);
+  --sidebar-accent: oklch(0.278 0.033 256.848);
+  --sidebar-accent-foreground: oklch(0.985 0.002 247.839);
+  --sidebar-border: oklch(1 0 0 / 10%);
+  --sidebar-ring: oklch(0.551 0.027 264.364);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-family: 'Kalam', cursive;
+  }
+  
+  html {
+    font-family: 'Kalam', cursive;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Mountains of Christmas', cursive;
+    font-weight: 700;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@layer utilities {
+  .christmas-gradient {
+    background: linear-gradient(135deg, hsl(var(--christmas-red)) 0%, hsl(var(--christmas-green)) 100%);
+  }
+  
+  .gold-shimmer {
+    background: linear-gradient(45deg, hsl(var(--christmas-gold)) 0%, hsl(43 80% 70%) 50%, hsl(var(--christmas-gold)) 100%);
+    background-size: 200% 200%;
+    animation: shimmer 3s ease-in-out infinite;
+  }
+  
+  @keyframes shimmer {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+  }
+  
+  @keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+  }
+  
+  .float-animation {
+    animation: float 3s ease-in-out infinite;
+  }
+  
+  /* Snowflake glow effect for prominent decorations */
+  .snowflake-glow {
+    filter: drop-shadow(0 0 8px currentColor);
+    animation: float 3s ease-in-out infinite, pulse-glow 4s ease-in-out infinite;
+  }
+  
+  @keyframes pulse-glow {
+    0%, 100% { 
+      filter: drop-shadow(0 0 8px currentColor);
+      opacity: 0.6;
+    }
+    50% { 
+      filter: drop-shadow(0 0 12px currentColor);
+      opacity: 1;
+    }
+  }
+  
+  /* Collapsible content animations */
+  @keyframes collapsible-down {
+    from {
+      height: 0;
+      opacity: 0;
+    }
+    to {
+      height: var(--radix-collapsible-content-height);
+      opacity: 1;
+    }
+  }
+  
+  @keyframes collapsible-up {
+    from {
+      height: var(--radix-collapsible-content-height);
+      opacity: 1;
+    }
+    to {
+      height: 0;
+      opacity: 0;
+    }
+  }
+  
+  [data-state="open"] > [data-radix-collapsible-content] {
+    animation: collapsible-down 300ms ease-out;
+  }
+  
+  [data-state="closed"] > [data-radix-collapsible-content] {
+    animation: collapsible-up 200ms ease-in;
+  }
+  
+  /* Touch-friendly tap targets */
+  @media (max-width: 768px) {
+    button, a, [role="button"] {
+      min-height: 44px;
+      min-width: 44px;
+    }
+  }
+  
+  /* Text wrapping utilities for mobile */
+  .overflow-wrap-anywhere {
+    overflow-wrap: anywhere;
+    word-wrap: anywhere;
+  }
+  
+  /* Prevent horizontal scrolling on mobile */
+  @media (max-width: 768px) {
+    body {
+      overflow-x: hidden;
+    }
+    
+    * {
+      max-width: 100%;
+    }
+  }
+}
+
+/* Print-only elements - hidden on screen */
+.print-only {
+  display: none;
+}
+
+/* Print Styles */
+@media print {
+  @page {
+    size: letter;
+    margin: 0; /* Remove margins to hide browser headers/footers */
+  }
+  
+  body {
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+    background: white !important;
+    margin: 0.35in; /* Add margin to body instead of @page */
+  }
+  
+  /* Remove background gradients and colors */
+  body > div,
+  main {
+    background: white !important;
+  }
+  
+  /* Hide decorative elements */
+  .fixed {
+    display: none !important;
+  }
+  
+  /* Hide page header and footer */
+  main > header,
+  main > footer {
+    display: none !important;
+  }
+  
+  /* Hide action buttons */
+  .no-print {
+    display: none !important;
+  }
+  
+  /* Show print-only elements */
+  .print-only {
+    display: block !important;
+  }
+  
+  /* Show print-only elements */
+  .print\:block {
+    display: block !important;
+  }
+  
+  /* Remove shadows and borders for cleaner print */
+  .print\:shadow-none {
+    box-shadow: none !important;
+  }
+  
+  .print\:border-0 {
+    border: none !important;
+  }
+  
+  /* Disable animations in print */
+  .print\:animate-none {
+    animation: none !important;
+  }
+  
+  /* Optimize letter layout for single page */
+  #letter-to-print {
+    max-width: 100% !important;
+    page-break-inside: avoid;
+    page-break-after: avoid;
+    background: white !important;
+  }
+  
+  /* Ensure clean white background everywhere */
+  * {
+    background-color: transparent !important;
+    background-image: none !important;
+  }
+  
+  #letter-to-print,
+  #letter-to-print * {
+    background: white !important;
+  }
+  
+  /* Compact padding */
+  .print\:p-3 {
+    padding: 0.5rem !important;
+  }
+  
+  .print\:p-6 {
+    padding: 1.25rem !important;
+  }
+  
+  /* Compact margins */
+  .print\:mb-4 {
+    margin-bottom: 0.75rem !important;
+  }
+  
+  .print\:mb-3 {
+    margin-bottom: 0.5rem !important;
+  }
+  
+  .print\:mb-2 {
+    margin-bottom: 0.4rem !important;
+  }
+  
+  .print\:mb-1 {
+    margin-bottom: 0.25rem !important;
+  }
+  
+  .print\:mb-0\.5 {
+    margin-bottom: 0.125rem !important;
+  }
+  
+  .print\:mt-3 {
+    margin-top: 0.5rem !important;
+  }
+  
+  .print\:mt-2 {
+    margin-top: 0.4rem !important;
+  }
+  
+  .print\:mt-1\.5 {
+    margin-top: 0.3rem !important;
+  }
+  
+  .print\:mt-1 {
+    margin-top: 0.25rem !important;
+  }
+  
+  /* Compact spacing */
+  .print\:space-y-0 > * + * {
+    margin-top: 0 !important;
+  }
+  
+  .print\:space-y-0\.5 > * + * {
+    margin-top: 0.125rem !important;
+  }
+  
+  .print\:space-y-1 > * + * {
+    margin-top: 0.25rem !important;
+  }
+  
+  .print\:space-y-2 > * + * {
+    margin-top: 0.4rem !important;
+  }
+  
+  .print\:gap-2 {
+    gap: 0.5rem !important;
+  }
+  
+  /* Optimized font sizes for print */
+  .print\:text-3xl {
+    font-size: 1.75rem !important;
+    line-height: 2rem !important;
+  }
+  
+  .print\:text-sm {
+    font-size: 0.875rem !important;
+    line-height: 1.25rem !important;
+  }
+  
+  .print\:text-xs {
+    font-size: 0.75rem !important;
+    line-height: 1rem !important;
+  }
+  
+  .print\:text-base {
+    font-size: 0.95rem !important;
+    line-height: 1.4rem !important;
+  }
+  
+  .print\:leading-normal {
+    line-height: 1.4 !important;
+  }
+  
+  .print\:leading-snug {
+    line-height: 1.3 !important;
+  }
+  
+  /* Icon and image sizes */
+  .print\:h-4 {
+    height: 0.875rem !important;
+  }
+  
+  .print\:w-4 {
+    width: 0.875rem !important;
+  }
+  
+  .print\:h-3 {
+    height: 0.75rem !important;
+  }
+  
+  .print\:w-3 {
+    width: 0.75rem !important;
+  }
+  
+  .print\:w-28 {
+    width: 7rem !important;
+  }
+  
+  .print\:w-32 {
+    width: 8rem !important;
+  }
+  
+  /* Prevent page breaks */
+  * {
+    page-break-inside: avoid;
+  }
 }

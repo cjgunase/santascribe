@@ -1,0 +1,73 @@
+---
+globs: **/*.css,**/*.tsx
+---
+# Styling Guidelines
+
+## Tailwind CSS v4
+
+This project uses Tailwind CSS v4 with CSS variables for theming.
+
+### Global Styles
+
+Theme colors and CSS variables are defined in [src/app/globals.css](mdc:src/app/globals.css).
+
+### Color Scheme
+
+- **Base Color**: Gray
+- **CSS Variables**: Enabled for dynamic theming
+- **Dark Mode**: Support through CSS variables
+
+### Utility-First Approach
+
+Use Tailwind utilities for styling:
+```typescript
+<div className="flex items-center gap-4 p-6 rounded-lg border">
+  <Button className="bg-primary text-primary-foreground">
+    Primary Action
+  </Button>
+</div>
+```
+
+### Conditional Styling
+
+Use the `cn()` utility from [@/lib/utils](mdc:src/lib/utils.ts):
+```typescript
+import { cn } from "@/lib/utils"
+
+<div className={cn(
+  "base-classes",
+  condition && "conditional-classes",
+  "more-classes"
+)}>
+  Content
+</div>
+```
+
+### Component-Specific Styles
+
+When extending shadcn/ui components:
+```typescript
+<Button className="hover:scale-105 transition-transform">
+  Custom Styled Button
+</Button>
+```
+
+### Icons
+
+Use lucide-react for all icons:
+```typescript
+import { ChevronRight, Check, X } from "lucide-react"
+
+<Button>
+  <Check className="mr-2 h-4 w-4" />
+  Confirm
+</Button>
+```
+
+## Best Practices
+
+1. **Prefer Tailwind utilities** over custom CSS
+2. **Use CSS variables** from globals.css for consistent theming
+3. **Maintain consistency** with the New York style (clean, minimal)
+4. **Responsive design** - use Tailwind's responsive prefixes (sm:, md:, lg:)
+5. **Don't override shadcn/ui styles** unless absolutely necessary

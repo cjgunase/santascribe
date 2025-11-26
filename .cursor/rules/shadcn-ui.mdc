@@ -1,0 +1,82 @@
+---
+alwaysApply: true
+---
+# shadcn/ui Configuration
+
+This project uses **shadcn/ui** for all UI components. shadcn/ui is initialized and configured in [components.json](mdc:components.json).
+
+## Project Configuration
+
+- **Style**: New York
+- **Framework**: Next.js 16 with React 19
+- **TypeScript**: Enabled with RSC (React Server Components)
+- **Icon Library**: lucide-react
+- **Styling**: Tailwind CSS v4 with CSS variables
+- **Base Color**: Gray
+
+## Path Aliases
+
+The following path aliases are configured:
+- `@/components` → `src/components`
+- `@/ui` → `src/components/ui`
+- `@/lib` → `src/lib`
+- `@/utils` → `src/lib/utils`
+- `@/hooks` → `src/hooks`
+
+## Currently Installed Components
+
+The following shadcn/ui components are already installed in [src/components/ui](mdc:src/components/ui):
+- [Button](mdc:src/components/ui/button.tsx)
+- [Card](mdc:src/components/ui/card.tsx)
+- [Dialog](mdc:src/components/ui/dialog.tsx)
+- [Input](mdc:src/components/ui/input.tsx)
+
+## Adding New Components
+
+To add a new shadcn/ui component, use the CLI:
+
+```bash
+npx shadcn@latest add [component-name]
+```
+
+Examples:
+```bash
+npx shadcn@latest add alert
+npx shadcn@latest add toast
+npx shadcn@latest add dropdown-menu
+```
+
+## Important Rules
+
+1. **Always use shadcn/ui components** for UI elements - do not create custom components when a shadcn/ui equivalent exists
+2. **Never modify core component files** in `src/components/ui/` directly unless absolutely necessary
+3. **Compose components** by importing from `@/ui` and wrapping them with additional functionality
+4. **Use the cn() utility** from [src/lib/utils.ts](mdc:src/lib/utils.ts) for conditional className merging
+5. **Install components via CLI** rather than copying code manually to ensure proper setup
+
+## Component Usage Pattern
+
+```typescript
+import { Button } from "@/ui/button"
+import { Card, CardContent, CardHeader } from "@/ui/card"
+
+export function MyComponent() {
+  return (
+    <Card>
+      <CardHeader>
+        <Button variant="default">Click me</Button>
+      </CardHeader>
+      <CardContent>
+        {/* Content */}
+      </CardContent>
+    </Card>
+  )
+}
+```
+
+## Styling Guidelines
+
+- Use Tailwind CSS utility classes for styling
+- Use the `cn()` utility for conditional classes
+- Leverage CSS variables defined in [src/app/globals.css](mdc:src/app/globals.css)
+- Follow the New York style conventions (minimal, clean aesthetics)
