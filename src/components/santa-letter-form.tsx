@@ -54,6 +54,12 @@ export function SantaLetterForm({ onGenerate }: SantaLetterFormProps) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Prevent double submission on mobile
+    if (isGenerating) {
+      return;
+    }
+    
     setError("");
     setIsGenerating(true);
 
@@ -100,17 +106,30 @@ export function SantaLetterForm({ onGenerate }: SantaLetterFormProps) {
               const parsed = JSON.parse(data);
               if (parsed.content) {
                 accumulatedLetter += parsed.content;
-                // Update the preview in real-time
-                onGenerate({
-                  letter: accumulatedLetter,
-                  formData,
-                });
               }
             } catch (e) {
               // Skip invalid JSON
             }
           }
         }
+      }
+
+      // Only call onGenerate once with the complete letter
+      // This prevents multiple re-renders during streaming on mobile
+      if (accumulatedLetter) {
+        const generatedData = {
+          letter: accumulatedLetter,
+          formData,
+        };
+        
+        // Store in sessionStorage as backup for mobile browsers
+        try {
+          sessionStorage.setItem('santaLetter', JSON.stringify(generatedData));
+        } catch (e) {
+          console.warn('Could not save to sessionStorage:', e);
+        }
+        
+        onGenerate(generatedData);
       }
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : "An error occurred";
@@ -135,7 +154,7 @@ export function SantaLetterForm({ onGenerate }: SantaLetterFormProps) {
         </div>
       </CardHeader>
       <CardContent className="p-4 md:p-6">
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4" action="javascript:void(0)">
           {/* Child's Name - Always Visible */}
           <div className="space-y-2">
             <Label htmlFor="childName" className="text-base md:text-lg font-semibold flex items-center gap-2">
