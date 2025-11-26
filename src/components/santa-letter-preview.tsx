@@ -91,7 +91,7 @@ export function SantaLetterPreview({ generatedLetter, onReset }: SantaLetterPrev
               alt="Santa's Sleigh with Reindeer"
               width={200}
               height={50}
-              className="w-full max-w-xs md:max-w-sm print:max-w-[10rem] h-auto"
+              className="w-full max-w-xs md:max-w-sm print:max-w-[5rem] h-auto"
               priority
             />
           </div>
