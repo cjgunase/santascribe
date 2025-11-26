@@ -22,9 +22,9 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background via-christmas-cream to-background">
+    <div className="min-h-screen bg-gradient-to-b from-background via-christmas-cream to-background overflow-x-hidden w-full">
       {/* Decorative Background Elements - Mobile Optimized */}
-      <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
+      <div className="fixed inset-0 pointer-events-none overflow-hidden z-0 w-full">
         <Snowflake className="absolute top-4 left-4 md:top-10 md:left-10 h-8 w-8 md:h-12 md:w-12 text-primary/20 animate-spin snowflake-glow" style={{ animationDuration: "20s" }} />
         <Snowflake className="absolute top-20 right-8 md:top-32 md:right-20 h-10 w-10 md:h-16 md:w-16 text-secondary/20 animate-spin snowflake-glow" style={{ animationDuration: "15s" }} />
         <Snowflake className="absolute bottom-32 left-8 md:bottom-20 md:left-1/4 h-6 w-6 md:h-10 md:w-10 text-accent/30 animate-spin snowflake-glow" style={{ animationDuration: "25s" }} />
@@ -34,7 +34,7 @@ export default function Home() {
       </div>
 
       {/* Main Content */}
-      <main className="relative z-10 flex flex-col items-center px-4 pt-3 pb-6 md:pt-4 md:pb-12 w-full overflow-x-hidden">
+      <main className="relative z-10 flex flex-col items-center px-4 pt-3 pb-6 md:pt-4 md:pb-12 w-full max-w-full overflow-x-hidden">
         {/* Header - Mobile Optimized */}
         <header className="text-center mb-4 md:mb-6 space-y-2 md:space-y-4">
           {/* Logo */}

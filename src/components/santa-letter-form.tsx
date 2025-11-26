@@ -122,8 +122,8 @@ export function SantaLetterForm({ onGenerate }: SantaLetterFormProps) {
   };
 
   return (
-    <Card className="w-full max-w-2xl border shadow-lg">
-      <CardHeader className="bg-gradient-to-r from-primary/10 via-secondary/10 to-primary/10 p-4 md:p-6">
+    <Card className="w-full max-w-2xl border shadow-lg overflow-hidden">
+      <CardHeader className="bg-gradient-to-r from-primary/10 via-secondary/10 to-primary/10 p-4 md:p-6 overflow-hidden">
         <div className="flex items-center gap-2 md:gap-3">
           <Gift className="h-6 w-6 md:h-8 md:w-8 text-primary float-animation flex-shrink-0" />
           <div className="flex-1 min-w-0">
