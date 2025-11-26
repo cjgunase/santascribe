@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { SantaLetterForm, type GeneratedLetter } from "@/components/santa-letter-form";
 import { SantaLetterPreview } from "@/components/santa-letter-preview";
 import { Snowflake, Sparkles } from "lucide-react";
@@ -9,42 +9,24 @@ export default function Home() {
   const [generatedLetter, setGeneratedLetter] = useState<GeneratedLetter | null>(null);
   const [showLetter, setShowLetter] = useState(false);
 
-  // Restore state from sessionStorage on mount (for mobile browser recovery)
-  useEffect(() => {
-    try {
-      const saved = sessionStorage.getItem('santaLetter');
-      if (saved) {
-        const data = JSON.parse(saved) as GeneratedLetter;
-        setGeneratedLetter(data);
-        setShowLetter(true);
-      }
-    } catch (e) {
-      console.warn('Could not restore from sessionStorage:', e);
-    }
-  }, []);
-
   const handleGenerateLetter = (data: GeneratedLetter) => {
     setGeneratedLetter(data);
     setShowLetter(true);
     
-    // Defer scroll to after render completes (critical for mobile)
-    requestAnimationFrame(() => {
-      setTimeout(() => {
-        window.scrollTo({ top: 0, behavior: "smooth" });
-      }, 100);
-    });
+    // Safari-safe scroll - use 'auto' instead of 'smooth' for better compatibility
+    setTimeout(() => {
+      try {
+        window.scrollTo({ top: 0, behavior: "auto" });
+      } catch (e) {
+        // Fallback for older browsers
+        window.scrollTo(0, 0);
+      }
+    }, 100);
   };
 
   const handleReset = () => {
     setShowLetter(false);
     setGeneratedLetter(null);
-    
-    // Clear sessionStorage when resetting
-    try {
-      sessionStorage.removeItem('santaLetter');
-    } catch (e) {
-      console.warn('Could not clear sessionStorage:', e);
-    }
   };
 
   return (

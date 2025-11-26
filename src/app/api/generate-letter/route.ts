@@ -1,6 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import OpenAI from "openai";
 
+// Vercel production configuration - CRITICAL for mobile Safari streaming
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
+export const maxDuration = 30; // Maximum execution time in seconds
+
 // Initialize OpenAI client
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -59,7 +64,7 @@ IMPORTANT: Write in a classic, old-fashioned style. DO NOT use any emojis - keep
       stream: true,
     });
 
-    // Create a ReadableStream for the response
+    // Create a ReadableStream for the response - Vercel/Safari compatible
     const encoder = new TextEncoder();
     const readableStream = new ReadableStream({
       async start(controller) {
@@ -67,22 +72,28 @@ IMPORTANT: Write in a classic, old-fashioned style. DO NOT use any emojis - keep
           for await (const chunk of stream) {
             const content = chunk.choices[0]?.delta?.content || '';
             if (content) {
-              controller.enqueue(encoder.encode(`data: ${JSON.stringify({ content })}\n\n`));
+              const message = `data: ${JSON.stringify({ content })}\n\n`;
+              controller.enqueue(encoder.encode(message));
             }
           }
           controller.enqueue(encoder.encode('data: [DONE]\n\n'));
           controller.close();
         } catch (error) {
+          console.error('Streaming error:', error);
           controller.error(error);
         }
       },
     });
 
+    // Vercel-optimized headers for mobile Safari streaming
     return new Response(readableStream, {
+      status: 200,
       headers: {
-        'Content-Type': 'text/event-stream',
-        'Cache-Control': 'no-cache',
+        'Content-Type': 'text/event-stream; charset=utf-8',
+        'Cache-Control': 'no-cache, no-transform',
         'Connection': 'keep-alive',
+        'X-Accel-Buffering': 'no', // Disable Nginx buffering
+        'Transfer-Encoding': 'chunked', // Enable chunked transfer
       },
     });
   } catch (error: unknown) {

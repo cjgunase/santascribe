@@ -54,6 +54,7 @@ export function SantaLetterForm({ onGenerate }: SantaLetterFormProps) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    e.stopPropagation();
     
     // Prevent double submission on mobile
     if (isGenerating) {
@@ -64,20 +65,27 @@ export function SantaLetterForm({ onGenerate }: SantaLetterFormProps) {
     setIsGenerating(true);
 
     try {
+      // Add timeout for Safari compatibility
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
+      
       const response = await fetch("/api/generate-letter", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(formData),
+        signal: controller.signal,
       });
+      
+      clearTimeout(timeoutId);
 
       if (!response.ok) {
         const data = await response.json();
         throw new Error(data.error || "Failed to generate letter");
       }
 
-      // Handle streaming response
+      // Handle streaming response with Safari-safe error handling
       const reader = response.body?.getReader();
       const decoder = new TextDecoder();
       let accumulatedLetter = "";
@@ -86,53 +94,84 @@ export function SantaLetterForm({ onGenerate }: SantaLetterFormProps) {
         throw new Error("No response body");
       }
 
-      while (true) {
-        const { done, value } = await reader.read();
+      try {
+        let buffer = '';
         
-        if (done) break;
-        
-        const chunk = decoder.decode(value);
-        const lines = chunk.split('\n');
-        
-        for (const line of lines) {
-          if (line.startsWith('data: ')) {
-            const data = line.slice(6);
+        while (true) {
+          const { done, value } = await reader.read();
+          
+          if (done) {
+            console.log('Stream complete');
+            break;
+          }
+          
+          // Decode chunk and add to buffer
+          buffer += decoder.decode(value, { stream: true });
+          
+          // Process complete lines from buffer
+          const lines = buffer.split('\n');
+          buffer = lines.pop() || ''; // Keep incomplete line in buffer
+          
+          for (const line of lines) {
+            const trimmedLine = line.trim();
+            
+            if (!trimmedLine || !trimmedLine.startsWith('data: ')) {
+              continue;
+            }
+            
+            const data = trimmedLine.slice(6).trim();
             
             if (data === '[DONE]') {
               continue;
             }
             
-            try {
-              const parsed = JSON.parse(data);
-              if (parsed.content) {
-                accumulatedLetter += parsed.content;
+            if (data) {
+              try {
+                const parsed = JSON.parse(data);
+                if (parsed.content) {
+                  accumulatedLetter += parsed.content;
+                }
+              } catch (parseError) {
+                console.warn('Failed to parse SSE data:', data, parseError);
               }
-            } catch (e) {
-              // Skip invalid JSON
             }
           }
         }
+      } catch (streamError) {
+        console.error('Stream reading error:', streamError);
+        
+        // If we have partial content, still show it
+        if (accumulatedLetter) {
+          onGenerate({
+            letter: accumulatedLetter,
+            formData,
+          });
+          return;
+        }
+        throw streamError;
       }
 
       // Only call onGenerate once with the complete letter
       // This prevents multiple re-renders during streaming on mobile
       if (accumulatedLetter) {
-        const generatedData = {
+        onGenerate({
           letter: accumulatedLetter,
           formData,
-        };
-        
-        // Store in sessionStorage as backup for mobile browsers
-        try {
-          sessionStorage.setItem('santaLetter', JSON.stringify(generatedData));
-        } catch (e) {
-          console.warn('Could not save to sessionStorage:', e);
-        }
-        
-        onGenerate(generatedData);
+        });
+      } else {
+        throw new Error("No content received");
       }
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : "An error occurred";
+      let errorMessage = "An error occurred";
+      
+      if (err instanceof Error) {
+        if (err.name === 'AbortError') {
+          errorMessage = "Request timed out. Please try again.";
+        } else {
+          errorMessage = err.message;
+        }
+      }
+      
       setError(errorMessage);
       console.error("Error generating letter:", err);
     } finally {
@@ -154,7 +193,7 @@ export function SantaLetterForm({ onGenerate }: SantaLetterFormProps) {
         </div>
       </CardHeader>
       <CardContent className="p-4 md:p-6">
-        <form onSubmit={handleSubmit} className="space-y-4" action="javascript:void(0)">
+        <form onSubmit={handleSubmit} className="space-y-4">
           {/* Child's Name - Always Visible */}
           <div className="space-y-2">
             <Label htmlFor="childName" className="text-base md:text-lg font-semibold flex items-center gap-2">
