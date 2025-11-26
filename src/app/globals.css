@@ -151,6 +151,28 @@
     animation: shimmer 3s ease-in-out infinite;
   }
   
+  .christmas-border {
+    border: 8px solid;
+    border-image: repeating-linear-gradient(
+      45deg,
+      hsl(var(--christmas-red)),
+      hsl(var(--christmas-red)) 15px,
+      hsl(var(--christmas-green)) 15px,
+      hsl(var(--christmas-green)) 30px
+    ) 8;
+  }
+  
+  .print\:christmas-border {
+    border: 6px solid;
+    border-image: repeating-linear-gradient(
+      45deg,
+      hsl(var(--christmas-red)),
+      hsl(var(--christmas-red)) 15px,
+      hsl(var(--christmas-green)) 15px,
+      hsl(var(--christmas-green)) 30px
+    ) 6;
+  }
+  
   @keyframes shimmer {
     0%, 100% { background-position: 0% 50%; }
     50% { background-position: 100% 50%; }

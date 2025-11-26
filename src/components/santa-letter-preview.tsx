@@ -60,7 +60,7 @@ export function SantaLetterPreview({ generatedLetter, onReset }: SantaLetterPrev
       </div>
 
       {/* Letter Card - Mobile Optimized */}
-      <Card id="letter-to-print" className="border-2 border-primary shadow-xl bg-gradient-to-b from-white via-christmas-cream to-white print:shadow-none print:border-0 print:bg-white overflow-hidden">
+      <Card id="letter-to-print" className="christmas-border print:christmas-border shadow-xl bg-gradient-to-b from-white via-christmas-cream to-white print:shadow-none print:bg-white overflow-hidden">
         <CardContent className="p-4 md:p-8 lg:p-12 print:p-3">
           {/* North Pole Header - Compact */}
           <div className="text-center mb-6 md:mb-8 print:mb-2 space-y-1 md:space-y-2 print:space-y-0.5">
