@@ -63,8 +63,8 @@ export function SantaLetterPreview({ generatedLetter, onReset }: SantaLetterPrev
       <Card id="letter-to-print" className="christmas-border print:christmas-border shadow-xl bg-gradient-to-b from-white via-christmas-cream to-white print:shadow-none print:bg-white overflow-hidden">
         <CardContent className="p-4 md:p-8 lg:p-12 print:p-3">
           {/* North Pole Header - Compact */}
-          <div className="text-center mb-6 md:mb-8 print:mb-2 space-y-1 md:space-y-2 print:space-y-0.5">
-            <div className="flex items-center justify-center gap-1.5 md:gap-2 mb-1 md:mb-2 print:mb-1 flex-wrap">
+          <div className="text-center mb-4 md:mb-5 print:mb-2 space-y-1 print:space-y-0.5">
+            <div className="flex items-center justify-center gap-1.5 md:gap-2 mb-1 print:mb-1 flex-wrap">
               <Snowflake className="h-4 w-4 md:h-6 md:w-6 print:h-4 print:w-4 text-primary animate-spin print:animate-none flex-shrink-0" style={{ animationDuration: "10s" }} />
               <h1 className="text-2xl md:text-4xl lg:text-5xl print:text-3xl text-primary break-words">Santa's Workshop</h1>
               <Snowflake className="h-4 w-4 md:h-6 md:w-6 print:h-4 print:w-4 text-primary animate-spin print:animate-none flex-shrink-0" style={{ animationDuration: "10s" }} />
@@ -73,7 +73,7 @@ export function SantaLetterPreview({ generatedLetter, onReset }: SantaLetterPrev
             <p className="text-xs md:text-sm print:text-xs text-muted-foreground">{currentDate}</p>
           </div>
 
-          <Separator className="mb-4 md:mb-6 print:mb-2 bg-gradient-to-r from-transparent via-primary to-transparent" />
+          <Separator className="mb-4 print:mb-2 bg-gradient-to-r from-transparent via-primary to-transparent" />
 
           {/* Letter Content - Mobile Optimized with proper text wrapping */}
           <div className="space-y-3 md:space-y-4 print:space-y-1 text-sm md:text-base lg:text-lg print:text-sm leading-relaxed print:leading-snug text-foreground break-words overflow-wrap-anywhere max-w-full">
