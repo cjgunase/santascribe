@@ -518,6 +518,12 @@
     page-break-inside: avoid;
   }
   
+  /* Scale down Asset1.png to 50% for print */
+  img[src="/Asset1.png"] {
+    max-width: 5rem !important;
+    width: 5rem !important;
+  }
+  
   /* Prevent page breaks within elements */
   h1, h2, h3, h4, h5, h6, p, img {
     page-break-inside: avoid;
