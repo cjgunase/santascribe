@@ -44,8 +44,9 @@ export async function POST(request: NextRequest) {
       gifts,
     });
 
-    // Call OpenAI API with streaming
-    const stream = await openai.chat.completions.create({
+    // Use NON-STREAMING for Safari mobile compatibility
+    // Safari has issues with SSE streaming on Vercel production
+    const completion = await openai.chat.completions.create({
       model: "gpt-4o-mini",
       messages: [
         {
@@ -61,40 +62,22 @@ IMPORTANT: Write in a classic, old-fashioned style. DO NOT use any emojis - keep
       ],
       temperature: 0.9,
       max_tokens: 400,
-      stream: true,
+      stream: false, // Disabled for Safari compatibility
     });
 
-    // Create a ReadableStream for the response - Vercel/Safari compatible
-    const encoder = new TextEncoder();
-    const readableStream = new ReadableStream({
-      async start(controller) {
-        try {
-          for await (const chunk of stream) {
-            const content = chunk.choices[0]?.delta?.content || '';
-            if (content) {
-              const message = `data: ${JSON.stringify({ content })}\n\n`;
-              controller.enqueue(encoder.encode(message));
-            }
-          }
-          controller.enqueue(encoder.encode('data: [DONE]\n\n'));
-          controller.close();
-        } catch (error) {
-          console.error('Streaming error:', error);
-          controller.error(error);
-        }
-      },
-    });
+    const letter = completion.choices[0]?.message?.content || '';
 
-    // Vercel-optimized headers for mobile Safari streaming
-    return new Response(readableStream, {
-      status: 200,
-      headers: {
-        'Content-Type': 'text/event-stream; charset=utf-8',
-        'Cache-Control': 'no-cache, no-transform',
-        'Connection': 'keep-alive',
-        'X-Accel-Buffering': 'no', // Disable Nginx buffering
-        'Transfer-Encoding': 'chunked', // Enable chunked transfer
-      },
+    if (!letter) {
+      return NextResponse.json(
+        { error: "No letter generated" },
+        { status: 500 }
+      );
+    }
+
+    // Return complete letter as JSON
+    return NextResponse.json({
+      letter,
+      success: true,
     });
   } catch (error: unknown) {
     console.error("Error generating letter:", error);

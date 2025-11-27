@@ -65,113 +65,33 @@ export function SantaLetterForm({ onGenerate }: SantaLetterFormProps) {
     setIsGenerating(true);
 
     try {
-      // Add timeout for Safari compatibility
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
-      
       const response = await fetch("/api/generate-letter", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(formData),
-        signal: controller.signal,
       });
-      
-      clearTimeout(timeoutId);
 
       if (!response.ok) {
         const data = await response.json();
         throw new Error(data.error || "Failed to generate letter");
       }
 
-      // Handle streaming response with Safari-safe error handling
-      const reader = response.body?.getReader();
-      const decoder = new TextDecoder();
-      let accumulatedLetter = "";
-
-      if (!reader) {
-        throw new Error("No response body");
+      // Simple JSON response (non-streaming for Safari mobile compatibility)
+      const data = await response.json();
+      
+      if (!data.letter) {
+        throw new Error("No letter content received");
       }
 
-      try {
-        let buffer = '';
-        
-        while (true) {
-          const { done, value } = await reader.read();
-          
-          if (done) {
-            console.log('Stream complete');
-            break;
-          }
-          
-          // Decode chunk and add to buffer
-          buffer += decoder.decode(value, { stream: true });
-          
-          // Process complete lines from buffer
-          const lines = buffer.split('\n');
-          buffer = lines.pop() || ''; // Keep incomplete line in buffer
-          
-          for (const line of lines) {
-            const trimmedLine = line.trim();
-            
-            if (!trimmedLine || !trimmedLine.startsWith('data: ')) {
-              continue;
-            }
-            
-            const data = trimmedLine.slice(6).trim();
-            
-            if (data === '[DONE]') {
-              continue;
-            }
-            
-            if (data) {
-              try {
-                const parsed = JSON.parse(data);
-                if (parsed.content) {
-                  accumulatedLetter += parsed.content;
-                }
-              } catch (parseError) {
-                console.warn('Failed to parse SSE data:', data, parseError);
-              }
-            }
-          }
-        }
-      } catch (streamError) {
-        console.error('Stream reading error:', streamError);
-        
-        // If we have partial content, still show it
-        if (accumulatedLetter) {
-          onGenerate({
-            letter: accumulatedLetter,
-            formData,
-          });
-          return;
-        }
-        throw streamError;
-      }
-
-      // Only call onGenerate once with the complete letter
-      // This prevents multiple re-renders during streaming on mobile
-      if (accumulatedLetter) {
-        onGenerate({
-          letter: accumulatedLetter,
-          formData,
-        });
-      } else {
-        throw new Error("No content received");
-      }
+      // Display the complete letter
+      onGenerate({
+        letter: data.letter,
+        formData,
+      });
     } catch (err) {
-      let errorMessage = "An error occurred";
-      
-      if (err instanceof Error) {
-        if (err.name === 'AbortError') {
-          errorMessage = "Request timed out. Please try again.";
-        } else {
-          errorMessage = err.message;
-        }
-      }
-      
+      const errorMessage = err instanceof Error ? err.message : "An error occurred";
       setError(errorMessage);
       console.error("Error generating letter:", err);
     } finally {
