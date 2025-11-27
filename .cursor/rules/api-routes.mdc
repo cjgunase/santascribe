@@ -1,0 +1,340 @@
+---
+globs: src/app/api/*/route.ts
+description: Guidelines for building API routes with AI integration
+---
+
+# API Routes Best Practices
+
+## Route Structure
+
+API routes should follow this structure:
+
+```typescript
+import { NextRequest, NextResponse } from "next/server";
+
+// Vercel production configuration
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
+export const maxDuration = 30;
+
+export async function POST(request: NextRequest) {
+  try {
+    // 1. Parse request body
+    const body = await request.json();
+    
+    // 2. Validate inputs
+    if (!body.requiredField) {
+      return NextResponse.json(
+        { error: "Required field is missing" },
+        { status: 400 }
+      );
+    }
+    
+    // 3. Process request (AI call, database query, etc.)
+    const result = await processRequest(body);
+    
+    // 4. Return response
+    return NextResponse.json({
+      data: result,
+      success: true,
+    });
+  } catch (error) {
+    // 5. Handle errors
+    return handleError(error);
+  }
+}
+```
+
+## Configuration Exports
+
+### Runtime Configuration
+
+```typescript
+export const runtime = 'nodejs'; // or 'edge'
+export const dynamic = 'force-dynamic'; // Disable caching
+export const maxDuration = 30; // Maximum execution time (seconds)
+```
+
+**Use `nodejs` runtime when:**
+- Using OpenAI SDK directly
+- Need file system access
+- Using heavy npm packages
+
+**Use `edge` runtime when:**
+- Using Vercel AI SDK with streaming
+- Need global distribution
+- Simple, fast responses
+
+## Request Handling
+
+### Parsing Request Body
+
+```typescript
+const body = await request.json();
+const { field1, field2 } = body;
+```
+
+### Accessing URL Parameters
+
+```typescript
+export async function GET(request: NextRequest) {
+  const { searchParams } = new URL(request.url);
+  const param = searchParams.get('param');
+}
+```
+
+### Reading Headers
+
+```typescript
+const authHeader = request.headers.get('authorization');
+```
+
+## Response Patterns
+
+### Success Response
+
+```typescript
+return NextResponse.json({
+  data: result,
+  success: true,
+}, { status: 200 });
+```
+
+### Error Response
+
+```typescript
+return NextResponse.json({
+  error: "Error message",
+  details: "Additional context",
+}, { status: 400 });
+```
+
+### Streaming Response (for AI SDK)
+
+```typescript
+import { streamText } from 'ai';
+
+const result = streamText({
+  model: openai('gpt-4o-mini'),
+  prompt: prompt,
+});
+
+return result.toDataStreamResponse();
+```
+
+## Error Handling
+
+### Comprehensive Error Handler
+
+```typescript
+function handleError(error: unknown): NextResponse {
+  console.error("API Error:", error);
+  
+  if (error instanceof Error) {
+    const errorMessage = error.message.toLowerCase();
+    
+    // Invalid API key
+    if (errorMessage.includes("incorrect api key")) {
+      return NextResponse.json(
+        {
+          error: "Invalid API Key",
+          details: "Check your .env.local file",
+        },
+        { status: 401 }
+      );
+    }
+    
+    // Quota exceeded
+    if (errorMessage.includes("quota")) {
+      return NextResponse.json(
+        {
+          error: "API Quota Exceeded",
+          details: "Check your billing settings",
+        },
+        { status: 402 }
+      );
+    }
+    
+    // Rate limit
+    if (errorMessage.includes("rate limit")) {
+      return NextResponse.json(
+        {
+          error: "Rate Limit Reached",
+          details: "Please wait and try again",
+        },
+        { status: 429 }
+      );
+    }
+    
+    // Network issues
+    if (errorMessage.includes("network") || errorMessage.includes("fetch failed")) {
+      return NextResponse.json(
+        {
+          error: "Connection Error",
+          details: "Cannot connect to service",
+        },
+        { status: 503 }
+      );
+    }
+    
+    // Generic error
+    return NextResponse.json(
+      { error: "Request failed", details: error.message },
+      { status: 500 }
+    );
+  }
+  
+  return NextResponse.json(
+    { error: "Unknown error occurred" },
+    { status: 500 }
+  );
+}
+```
+
+## Status Codes
+
+Use appropriate HTTP status codes:
+
+- **200**: Success
+- **201**: Created
+- **400**: Bad Request (validation error)
+- **401**: Unauthorized (invalid credentials)
+- **402**: Payment Required (quota exceeded)
+- **404**: Not Found
+- **429**: Too Many Requests (rate limit)
+- **500**: Internal Server Error
+- **503**: Service Unavailable (network error)
+
+## Validation
+
+### Input Validation Pattern
+
+```typescript
+// Required fields
+if (!body.requiredField) {
+  return NextResponse.json(
+    { error: "Required field is missing" },
+    { status: 400 }
+  );
+}
+
+// Type validation
+if (typeof body.age !== 'number') {
+  return NextResponse.json(
+    { error: "Age must be a number" },
+    { status: 400 }
+  );
+}
+
+// Range validation
+if (body.age < 1 || body.age > 100) {
+  return NextResponse.json(
+    { error: "Age must be between 1 and 100" },
+    { status: 400 }
+  );
+}
+```
+
+## Environment Variables
+
+### Checking Required Variables
+
+```typescript
+if (!process.env.REQUIRED_API_KEY) {
+  return NextResponse.json(
+    {
+      error: "Service not configured",
+      details: "Add REQUIRED_API_KEY to .env.local",
+    },
+    { status: 500 }
+  );
+}
+```
+
+## Testing API Routes
+
+### Health Check Route
+
+Always include a health check route:
+
+```typescript
+// src/app/api/health/route.ts
+export async function GET() {
+  return NextResponse.json({
+    status: 'ok',
+    timestamp: new Date().toISOString(),
+  });
+}
+```
+
+### Testing with curl
+
+```bash
+curl -X POST http://localhost:3000/api/endpoint \
+  -H "Content-Type: application/json" \
+  -d '{"field": "value"}'
+```
+
+## Performance
+
+### Caching Considerations
+
+```typescript
+// Disable caching for dynamic content
+export const dynamic = 'force-dynamic';
+
+// Enable caching for static content
+export const revalidate = 3600; // Cache for 1 hour
+```
+
+### Timeout Handling
+
+```typescript
+export const maxDuration = 30; // Vercel timeout
+
+// Or implement custom timeout
+const timeoutPromise = new Promise((_, reject) =>
+  setTimeout(() => reject(new Error('Request timeout')), 30000)
+);
+
+const result = await Promise.race([
+  processRequest(body),
+  timeoutPromise,
+]);
+```
+
+## Security
+
+### CORS Headers
+
+```typescript
+const headers = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': 'POST, OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type',
+};
+
+// Handle OPTIONS request
+export async function OPTIONS() {
+  return NextResponse.json({}, { headers });
+}
+```
+
+### Rate Limiting
+
+Consider implementing rate limiting for production:
+
+```typescript
+// Pseudocode - implement with Redis or similar
+const rateLimiter = await checkRateLimit(request);
+if (!rateLimiter.allowed) {
+  return NextResponse.json(
+    { error: "Too many requests" },
+    { status: 429 }
+  );
+}
+```
+
+## References
+
+See [src/app/api/generate-letter/route.ts](mdc:src/app/api/generate-letter/route.ts) for a complete implementation example.

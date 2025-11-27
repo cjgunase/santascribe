@@ -1,0 +1,344 @@
+---
+description: Vercel AI SDK usage patterns and generateText API reference
+---
+
+# Vercel AI SDK Reference
+
+This guide covers the Vercel AI SDK (`ai` package) for text generation in this project.
+
+## Installation
+
+```bash
+npm install ai @ai-sdk/openai
+```
+
+## Core Functions
+
+The Vercel AI SDK provides two main functions for text generation:
+
+1. **`generateText`** - For complete, non-streaming responses
+2. **`streamText`** - For streaming responses
+
+## generateText API
+
+### Basic Usage
+
+```typescript
+import { generateText } from 'ai';
+import { openai } from '@ai-sdk/openai';
+
+const result = await generateText({
+  model: openai('gpt-4o-mini'),
+  prompt: 'What is the capital of France?',
+});
+
+console.log(result.text);
+```
+
+### With System Messages
+
+```typescript
+const result = await generateText({
+  model: openai('gpt-4o-mini'),
+  system: 'You are a helpful assistant.',
+  prompt: 'Write a haiku about programming.',
+});
+```
+
+### With Message Array
+
+```typescript
+const result = await generateText({
+  model: openai('gpt-4o-mini'),
+  messages: [
+    {
+      role: 'system',
+      content: 'You are a helpful assistant.',
+    },
+    {
+      role: 'user',
+      content: 'What is TypeScript?',
+    },
+  ],
+});
+```
+
+### All Configuration Options
+
+```typescript
+const result = await generateText({
+  // Required
+  model: openai('gpt-4o-mini'),
+  
+  // Input (use one)
+  prompt: 'Your prompt here',
+  // OR
+  messages: [...],
+  
+  // Optional - Generation Parameters
+  system: 'System prompt',
+  temperature: 0.7,        // 0.0 to 2.0 (default: varies by model)
+  maxTokens: 500,          // Maximum tokens to generate
+  topP: 1.0,               // Nucleus sampling (0 to 1)
+  topK: 40,                // Top-K sampling
+  presencePenalty: 0,      // -2.0 to 2.0
+  frequencyPenalty: 0,     // -2.0 to 2.0
+  stopSequences: ['END'],  // Stop generation at these strings
+  seed: 42,                // For reproducible outputs
+  
+  // Optional - Tools & Functions
+  tools: {...},            // Tool definitions
+  toolChoice: 'auto',      // How to use tools
+  maxSteps: 5,             // Max tool calling iterations
+  
+  // Optional - Headers
+  headers: {
+    'http-referer': 'https://myapp.com',
+    'x-title': 'My App',
+  },
+  
+  // Optional - Callbacks
+  onFinish: (result) => {
+    console.log('Generation complete', result);
+  },
+  
+  // Optional - Abort Control
+  abortSignal: controller.signal,
+});
+```
+
+## Return Value
+
+The `generateText` function returns a promise that resolves to:
+
+```typescript
+{
+  text: string;              // Generated text
+  finishReason: string;      // 'stop' | 'length' | 'content-filter' | 'tool-calls'
+  usage: {                   // Token usage
+    promptTokens: number;
+    completionTokens: number;
+    totalTokens: number;
+  };
+  toolCalls?: [...];         // If tools were used
+  toolResults?: [...];       // Results from tool calls
+  warnings?: [...];          // Any warnings
+  response: {                // Raw response metadata
+    id: string;
+    timestamp: Date;
+    modelId: string;
+  };
+}
+```
+
+## streamText API
+
+For real-time streaming responses:
+
+```typescript
+import { streamText } from 'ai';
+import { openai } from '@ai-sdk/openai';
+
+const result = streamText({
+  model: openai('gpt-4o-mini'),
+  prompt: 'Write a story about a robot.',
+});
+
+// Return as data stream response (in API routes)
+return result.toDataStreamResponse();
+
+// Or consume the stream
+for await (const chunk of result.textStream) {
+  console.log(chunk);
+}
+```
+
+## Provider Configuration
+
+### Using OpenAI Provider
+
+```typescript
+import { openai } from '@ai-sdk/openai';
+import { generateText } from 'ai';
+
+// Method 1: Provider instance
+const result = await generateText({
+  model: openai('gpt-4o-mini'),
+  prompt: 'Hello world',
+});
+
+// Method 2: Provider with custom config
+import { createOpenAI } from '@ai-sdk/openai';
+
+const customOpenAI = createOpenAI({
+  apiKey: process.env.CUSTOM_OPENAI_KEY,
+  baseURL: 'https://custom-endpoint.com/v1',
+  organization: 'org-123',
+});
+
+const result2 = await generateText({
+  model: customOpenAI('gpt-4o-mini'),
+  prompt: 'Hello world',
+});
+```
+
+### Using AI Gateway
+
+```typescript
+import { generateText } from 'ai';
+
+// Direct string format (uses AI Gateway by default)
+const result = await generateText({
+  model: 'openai/gpt-4o-mini',  // Format: provider/model
+  prompt: 'Hello world',
+});
+
+// Or with gateway provider
+import { gateway } from '@ai-sdk/gateway';
+
+const result2 = await generateText({
+  model: gateway('openai/gpt-4o-mini'),
+  prompt: 'Hello world',
+});
+```
+
+## Available Models
+
+### OpenAI Models
+
+- `gpt-4o` - Most capable, multimodal
+- `gpt-4o-mini` - Fast and cost-effective
+- `gpt-4-turbo` - Previous generation, still powerful
+- `gpt-3.5-turbo` - Legacy, fast and cheap
+
+### Via AI Gateway
+
+- `openai/gpt-4o`
+- `openai/gpt-4o-mini`
+- `anthropic/claude-sonnet-4`
+- `anthropic/claude-opus-4`
+- `xai/grok-3`
+- `xai/grok-4`
+
+Check [AI Gateway Models](https://vercel.com/docs/ai-gateway/models-and-providers) for the full list.
+
+## Error Handling
+
+```typescript
+import { generateText } from 'ai';
+import { openai } from '@ai-sdk/openai';
+
+try {
+  const result = await generateText({
+    model: openai('gpt-4o-mini'),
+    prompt: 'Hello world',
+  });
+  
+  console.log(result.text);
+} catch (error) {
+  if (error instanceof Error) {
+    console.error('Generation failed:', error.message);
+    
+    // Check specific error types
+    if (error.message.includes('API key')) {
+      // Handle API key error
+    } else if (error.message.includes('quota')) {
+      // Handle quota error
+    }
+  }
+}
+```
+
+## Migration from OpenAI SDK
+
+### Before (OpenAI SDK)
+
+```typescript
+import OpenAI from "openai";
+
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
+});
+
+const completion = await openai.chat.completions.create({
+  model: "gpt-4o-mini",
+  messages: [
+    { role: "system", content: "You are a helpful assistant." },
+    { role: "user", content: "Hello!" },
+  ],
+  temperature: 0.7,
+  max_tokens: 500,
+});
+
+const text = completion.choices[0]?.message?.content;
+```
+
+### After (Vercel AI SDK)
+
+```typescript
+import { generateText } from 'ai';
+import { openai } from '@ai-sdk/openai';
+
+const result = await generateText({
+  model: openai('gpt-4o-mini'),
+  messages: [
+    { role: 'system', content: 'You are a helpful assistant.' },
+    { role: 'user', content: 'Hello!' },
+  ],
+  temperature: 0.7,
+  maxTokens: 500,
+});
+
+const text = result.text;
+```
+
+## Benefits of Vercel AI SDK
+
+1. **Unified API** - Same interface for all providers
+2. **Better TypeScript** - Improved type safety
+3. **Built-in Streaming** - Easy streaming with `streamText`
+4. **Tools Support** - Native function calling
+5. **AI Gateway Integration** - Easy model switching
+6. **Better DX** - Cleaner API design
+7. **Framework Integration** - Works great with Next.js
+
+## Next Steps for Migration
+
+To migrate [src/app/api/generate-letter/route.ts](mdc:src/app/api/generate-letter/route.ts) to Vercel AI SDK:
+
+1. Install the SDK:
+```bash
+npm install ai @ai-sdk/openai
+```
+
+2. Replace imports:
+```typescript
+// Remove
+import OpenAI from "openai";
+
+// Add
+import { generateText } from 'ai';
+import { openai } from '@ai-sdk/openai';
+```
+
+3. Update the API call:
+```typescript
+// Before
+const completion = await openai.chat.completions.create({...});
+const letter = completion.choices[0]?.message?.content || '';
+
+// After
+const result = await generateText({
+  model: openai('gpt-4o-mini'),
+  messages: [...],
+});
+const letter = result.text;
+```
+
+## Resources
+
+- [Vercel AI SDK Documentation](https://sdk.vercel.ai/docs)
+- [generateText API Reference](https://sdk.vercel.ai/docs/ai-sdk-core/generating-text)
+- [streamText API Reference](https://sdk.vercel.ai/docs/ai-sdk-core/streaming-text)
+- [AI Gateway Documentation](https://vercel.com/docs/ai-gateway)
+- [Provider List](https://sdk.vercel.ai/providers)

@@ -1,0 +1,224 @@
+---
+globs: src/app/api/*/route.ts,src/lib/*.ts
+description: Best practices for AI text generation and prompt engineering
+---
+
+# AI Text Generation Best Practices
+
+## Prompt Engineering
+
+### Structure Your Prompts
+
+Use a clear structure for prompts:
+
+1. **Context**: Who is the AI? What's its role?
+2. **Instructions**: What should it do?
+3. **Format**: How should the output be structured?
+4. **Constraints**: What limits apply?
+5. **Data**: What information to use?
+
+### Example from Santa Letter Generator
+
+```typescript
+const systemPrompt = `You are Santa Claus writing SHORT, SWEET letters from the North Pole!
+Keep it BRIEF - just 3-4 short paragraphs max.
+Be enthusiastic and magical but GET TO THE POINT quickly.
+Write like you're talking to a kid - friendly, warm, and playful.
+Use age-appropriate vocabulary.
+
+IMPORTANT: Write in a classic, old-fashioned style.
+DO NOT use any emojis - keep the letter traditional and timeless.`;
+```
+
+### Prompt Building Function
+
+Always use a function to build dynamic prompts:
+
+```typescript
+function buildPrompt(data: {
+  // Define your data structure
+}) {
+  let prompt = `Base instruction\n\n`;
+  
+  // Add conditional sections
+  if (data.field) {
+    prompt += `- Field: ${data.field}\n`;
+  }
+  
+  // Add context
+  prompt += `Context:\n`;
+  
+  return prompt;
+}
+```
+
+## Best Practices
+
+### 1. Be Specific About Length
+
+✅ **Good**: "Write a 3-4 paragraph letter, maximum 300 words"
+
+❌ **Bad**: "Write a short letter"
+
+### 2. Specify Format Explicitly
+
+✅ **Good**: 
+```
+Format:
+[Greeting]
+[Body paragraph 1]
+[Body paragraph 2]
+[Closing]
+[Signature]
+```
+
+❌ **Bad**: "Write a letter with greeting and closing"
+
+### 3. Use Examples When Possible
+
+Include example outputs in your system prompt to guide the AI.
+
+### 4. Control Creativity with Temperature
+
+- **Factual content**: 0.2 - 0.4
+- **Creative writing**: 0.7 - 1.0
+- **Highly varied outputs**: 1.1 - 1.5
+
+### 5. Set Appropriate Token Limits
+
+Rule of thumb: 1 token ≈ 0.75 words
+
+- Short responses (1-2 sentences): 50-100 tokens
+- Paragraphs: 150-300 tokens
+- Full articles: 500-2000 tokens
+- **Santa letters**: 400 tokens (≈300 words)
+
+### 6. Include Current Date/Time When Relevant
+
+```typescript
+prompt += `The current date is ${new Date().toLocaleDateString("en-US", {
+  month: "long",
+  day: "numeric",
+  year: "numeric",
+})}.\n`;
+```
+
+### 7. Specify Tone Explicitly
+
+```typescript
+if (condition) {
+  prompt += `\nTone: SUPER EXCITED and proud! Celebrate their awesome behavior!`;
+} else {
+  prompt += `\nTone: Still super friendly and believe in them 100%!`;
+}
+```
+
+## Validation
+
+### Input Validation
+
+Always validate required fields before calling the AI:
+
+```typescript
+if (!requiredField) {
+  return NextResponse.json(
+    { error: "Required field is missing" },
+    { status: 400 }
+  );
+}
+```
+
+### Output Validation
+
+Check that the AI generated valid output:
+
+```typescript
+const output = completion.choices[0]?.message?.content || '';
+
+if (!output) {
+  return NextResponse.json(
+    { error: "No content generated" },
+    { status: 500 }
+  );
+}
+```
+
+## Testing
+
+### Test Different Scenarios
+
+Create test cases for:
+- Minimum required fields
+- Maximum fields
+- Edge cases (empty strings, special characters)
+- Different age groups
+- Different tones/moods
+
+### Monitor Token Usage
+
+Log token usage to optimize costs:
+
+```typescript
+console.log('Tokens used:', {
+  prompt: completion.usage?.prompt_tokens,
+  completion: completion.usage?.completion_tokens,
+  total: completion.usage?.total_tokens,
+});
+```
+
+## Performance Optimization
+
+### 1. Cache System Prompts
+
+Don't rebuild static prompts on every request.
+
+### 2. Use Appropriate Models
+
+- **Simple tasks**: gpt-4o-mini (faster, cheaper)
+- **Complex tasks**: gpt-4o or gpt-4-turbo
+
+### 3. Implement Timeouts
+
+Set reasonable timeouts for AI requests:
+
+```typescript
+export const maxDuration = 30; // seconds
+```
+
+### 4. Consider Streaming for Long Content
+
+For responses longer than a few paragraphs, use streaming to improve perceived performance.
+
+## Safety and Content Guidelines
+
+### 1. Content Filtering
+
+Consider implementing content filtering for user inputs:
+- Remove offensive language
+- Validate age-appropriate content
+- Check for PII (Personal Identifiable Information)
+
+### 2. Rate Limiting
+
+Implement rate limiting to prevent abuse and control costs.
+
+### 3. User Privacy
+
+Never log or store sensitive user information passed to the AI.
+
+## Common Pitfalls to Avoid
+
+❌ **Don't**: Use vague instructions like "be creative"
+✅ **Do**: Specify exactly what creativity means for your use case
+
+❌ **Don't**: Assume the AI knows your application context
+✅ **Do**: Provide all necessary context in the prompt
+
+❌ **Don't**: Use inconsistent formatting in prompts
+✅ **Do**: Use clear separators and consistent structure
+
+❌ **Don't**: Forget to handle errors
+✅ **Do**: Implement comprehensive error handling
+
+❌ **Don't**: Hard-code prompts in multiple places
+✅ **Do**: Centralize prompt logic in reusable functions

@@ -1,0 +1,164 @@
+---
+alwaysApply: true
+description: Guidelines for AI integration using Vercel AI SDK and OpenAI
+---
+
+# AI Integration Guidelines
+
+This project uses AI to generate personalized Santa letters. The AI integration can be implemented using either the Vercel AI SDK or OpenAI directly.
+
+## Current Implementation
+
+The project currently uses the **OpenAI SDK directly** in [src/app/api/generate-letter/route.ts](mdc:src/app/api/generate-letter/route.ts).
+
+### Key Configuration
+
+```typescript
+import OpenAI from "openai";
+
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
+});
+```
+
+## Vercel AI SDK Alternative (Recommended)
+
+For future enhancements, consider migrating to the Vercel AI SDK which provides:
+- Unified interface for multiple AI providers
+- Built-in streaming support
+- Better TypeScript types
+- Simplified error handling
+
+### Installation
+
+```bash
+npm install ai @ai-sdk/openai
+```
+
+### Basic Usage with generateText
+
+```typescript
+import { generateText } from 'ai';
+import { openai } from '@ai-sdk/openai';
+
+export async function POST(request: Request) {
+  const result = await generateText({
+    model: openai('gpt-4o-mini'),
+    prompt: 'Your prompt here',
+    temperature: 0.9,
+    maxTokens: 400,
+  });
+
+  return Response.json({ text: result.text });
+}
+```
+
+### Using AI Gateway (Optional)
+
+For production applications, you can use Vercel AI Gateway for unified model management:
+
+```typescript
+import { generateText } from 'ai';
+
+const result = await generateText({
+  model: 'openai/gpt-4o-mini', // Format: provider/model-name
+  prompt: 'Your prompt here',
+});
+```
+
+## API Configuration Best Practices
+
+### 1. Environment Variables
+
+Always use environment variables for API keys:
+- `OPENAI_API_KEY` - Your OpenAI API key
+- `AI_GATEWAY_API_KEY` - (Optional) For Vercel AI Gateway
+
+### 2. Runtime Configuration
+
+For Vercel production deployments with mobile Safari compatibility:
+
+```typescript
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
+export const maxDuration = 30;
+```
+
+### 3. Model Selection
+
+Current recommended models:
+- **gpt-4o-mini**: Fast, cost-effective for short text generation
+- **gpt-4o**: More capable for complex tasks
+- **gpt-4-turbo**: Good balance of speed and quality
+
+## Streaming vs Non-Streaming
+
+### Non-Streaming (Current Implementation)
+
+Best for:
+- Mobile Safari compatibility
+- Simple responses
+- When you need the complete response before processing
+
+```typescript
+const completion = await openai.chat.completions.create({
+  model: "gpt-4o-mini",
+  messages: [{ role: "system", content: "..." }],
+  stream: false,
+});
+```
+
+### Streaming (Future Enhancement)
+
+Best for:
+- Real-time user feedback
+- Long-form content
+- Desktop browsers
+
+```typescript
+import { streamText } from 'ai';
+
+const result = streamText({
+  model: openai('gpt-4o-mini'),
+  prompt: 'Your prompt here',
+});
+
+return result.toDataStreamResponse();
+```
+
+## Error Handling
+
+Always handle these common AI API errors:
+
+1. **Invalid API Key** (401)
+2. **Quota Exceeded** (402)
+3. **Rate Limit** (429)
+4. **Network Errors** (503)
+
+See [src/app/api/generate-letter/route.ts](mdc:src/app/api/generate-letter/route.ts) for complete error handling examples.
+
+## Model Parameters
+
+### Temperature
+- Range: 0.0 to 2.0
+- Lower (0.2-0.5): More focused, deterministic
+- Higher (0.8-1.2): More creative, varied
+- **Project default**: 0.9 (creative but controlled)
+
+### Max Tokens
+- Controls maximum response length
+- **Project default**: 400 tokens (~300 words)
+
+### System Prompts
+
+Always include clear system prompts that define:
+- Role and personality
+- Output format requirements
+- Length constraints
+- Style guidelines
+
+## Resources
+
+- [Vercel AI SDK Documentation](https://sdk.vercel.ai/)
+- [OpenAI API Reference](https://platform.openai.com/docs/api-reference)
+- [AI Gateway Documentation](https://vercel.com/docs/ai-gateway)
