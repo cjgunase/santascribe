@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { SantaLetterForm, type GeneratedLetter } from "@/components/santa-letter-form";
 import { SantaLetterPreview } from "@/components/santa-letter-preview";
-import { Snowflake, Sparkles } from "lucide-react";
+import { Snowflake, Sparkles, Coffee } from "lucide-react";
 
 export default function Home() {
   const [generatedLetter, setGeneratedLetter] = useState<GeneratedLetter | null>(null);
@@ -12,7 +12,7 @@ export default function Home() {
   const handleGenerateLetter = (data: GeneratedLetter) => {
     setGeneratedLetter(data);
     setShowLetter(true);
-    
+
     // Safari-safe scroll - use 'auto' instead of 'smooth' for better compatibility
     setTimeout(() => {
       try {
@@ -47,13 +47,13 @@ export default function Home() {
         <header className="text-center mb-4 md:mb-6 space-y-2 md:space-y-4">
           {/* Logo */}
           <div className="flex justify-center mb-3 md:mb-6">
-            <img 
-              src="/logo.jpg" 
-              alt="SantaScribe Logo" 
+            <img
+              src="/logo.jpg"
+              alt="SantaScribe Logo"
               className="h-16 w-16 md:h-24 md:w-24 lg:h-32 lg:w-32 object-contain drop-shadow-lg"
             />
           </div>
-          
+
           <div className="flex items-center justify-center gap-2 md:gap-3 mb-2 md:mb-4">
             <Sparkles className="h-6 w-6 md:h-10 md:w-10 text-accent float-animation" />
             <h1 className="text-3xl md:text-6xl lg:text-7xl text-primary drop-shadow-lg">
@@ -85,7 +85,18 @@ export default function Home() {
             <p className="text-xs md:text-sm">Made with ❤️ and Christmas magic</p>
             <Snowflake className="h-3 w-3 md:h-4 md:w-4" />
           </div>
-          <p className="text-[10px] md:text-xs">© {new Date().getFullYear()} SantaScribe. Spreading joy, one letter at a time.</p>
+          <div className="flex items-center justify-center gap-2 mt-2">
+            <a
+              href="https://buymeacoffee.com/santascribe"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 text-xs md:text-sm text-muted-foreground hover:text-primary transition-colors"
+            >
+              <Coffee className="h-3 w-3 md:h-4 md:w-4" />
+              <span>Buy me a coffee</span>
+            </a>
+          </div>
+          <p className="text-[10px] md:text-xs mt-2">© {new Date().getFullYear()} SantaScribe. Spreading joy, one letter at a time.</p>
         </footer>
       </main>
     </div>
