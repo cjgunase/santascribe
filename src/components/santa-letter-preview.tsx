@@ -110,7 +110,7 @@ export function SantaLetterPreview({ generatedLetter, onReset }: SantaLetterPrev
           <Separator className="mb-4 print:mb-0.5 bg-gradient-to-r from-transparent via-primary to-transparent" />
 
           {/* Letter Content - Mobile Optimized with proper text wrapping */}
-          <div className="space-y-3 md:space-y-4 print:space-y-0 text-base md:text-lg lg:text-xl print:text-2xl leading-relaxed print:leading-relaxed text-foreground break-words overflow-wrap-anywhere max-w-full">
+          <div className="space-y-0 text-base md:text-lg lg:text-xl print:text-2xl leading-relaxed print:leading-relaxed text-foreground break-words overflow-wrap-anywhere max-w-full">
             {letter.split('\n').map((line, index) => {
               // Check if line is a signature or important line
               const isSantaSignature = line.includes('Santa Claus');
