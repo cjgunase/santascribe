@@ -62,14 +62,19 @@ export function SantaLetterPreview({ generatedLetter, onReset }: SantaLetterPrev
     <div className="w-full max-w-3xl space-y-4 md:space-y-6 print:space-y-0 print:max-w-full overflow-x-hidden">
       {/* Top Action Buttons - Visible before scrolling */}
       <div className="flex flex-col sm:flex-row gap-3 md:gap-4 no-print w-full">
-        <Button
-          onClick={handlePrint}
-          size="lg"
-          className="flex-1 bg-white hover:bg-red-50 text-red-600 border-4 border-red-600 hover:border-red-700 font-bold h-12 md:h-14 text-sm md:text-base shadow-lg hover:shadow-xl transition-all"
-        >
-          <Download className="mr-2 h-4 w-4 md:h-5 md:w-5" />
-          Print Letter
-        </Button>
+        <div className="flex-1 flex flex-col gap-1">
+          <Button
+            onClick={handlePrint}
+            size="lg"
+            className="w-full bg-white hover:bg-red-50 text-red-600 border-4 border-red-600 hover:border-red-700 font-bold h-12 md:h-14 text-sm md:text-base shadow-lg hover:shadow-xl transition-all"
+          >
+            <Download className="mr-2 h-4 w-4 md:h-5 md:w-5" />
+            Print Letter
+          </Button>
+          <p className="text-xs text-muted-foreground text-center font-medium">
+            For best results, use Google Chrome, save as PDF and then print.
+          </p>
+        </div>
         <Button
           onClick={onReset}
           size="lg"
@@ -150,14 +155,19 @@ export function SantaLetterPreview({ generatedLetter, onReset }: SantaLetterPrev
 
       {/* Bottom Action Buttons - Mobile Optimized */}
       <div className="flex flex-col sm:flex-row gap-3 md:gap-4 no-print">
-        <Button
-          onClick={handlePrint}
-          size="lg"
-          className="flex-1 bg-white hover:bg-red-50 text-red-600 border-4 border-red-600 hover:border-red-700 font-bold h-12 md:h-14 text-sm md:text-base shadow-lg hover:shadow-xl transition-all"
-        >
-          <Download className="mr-2 h-4 w-4 md:h-5 md:w-5" />
-          Print Letter
-        </Button>
+        <div className="flex-1 flex flex-col gap-1">
+          <Button
+            onClick={handlePrint}
+            size="lg"
+            className="w-full bg-white hover:bg-red-50 text-red-600 border-4 border-red-600 hover:border-red-700 font-bold h-12 md:h-14 text-sm md:text-base shadow-lg hover:shadow-xl transition-all"
+          >
+            <Download className="mr-2 h-4 w-4 md:h-5 md:w-5" />
+            Print Letter
+          </Button>
+          <p className="text-xs text-muted-foreground text-center font-medium">
+            For best results, use Google Chrome, save as PDF and then print.
+          </p>
+        </div>
         <Button
           onClick={onReset}
           size="lg"
