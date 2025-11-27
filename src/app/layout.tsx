@@ -1,15 +1,16 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
   title: "SantaScribe - Magical Letters from Santa",
   description: "Create personalized, magical letters from Santa Claus to your children. Bring the wonder of Christmas to life with custom letters from the North Pole!",
-  viewport: {
-    width: "device-width",
-    initialScale: 1,
-    maximumScale: 5, // Allow zoom for better mobile accessibility
-    userScalable: true,
-  },
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5, // Allow zoom for better mobile accessibility
+  userScalable: true,
 };
 
 export default function RootLayout({
