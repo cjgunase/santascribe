@@ -23,10 +23,10 @@ export function SantaLetterPreview({ generatedLetter, onReset }: SantaLetterPrev
     // Temporarily change title to remove it from print header
     const originalTitle = document.title;
     document.title = ' ';
-    
+
     // Add mobile print optimization
     const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-    
+
     if (isMobile) {
       // Force viewport meta for print on mobile
       const viewportMeta = document.querySelector('meta[name="viewport"]');
@@ -34,7 +34,7 @@ export function SantaLetterPreview({ generatedLetter, onReset }: SantaLetterPrev
       if (viewportMeta) {
         viewportMeta.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no');
       }
-      
+
       setTimeout(() => {
         window.print();
         setTimeout(() => {
@@ -110,51 +110,41 @@ export function SantaLetterPreview({ generatedLetter, onReset }: SantaLetterPrev
           <Separator className="mb-4 print:mb-0.5 bg-gradient-to-r from-transparent via-primary to-transparent" />
 
           {/* Letter Content - Mobile Optimized with proper text wrapping */}
-          <div className="space-y-0 text-base md:text-lg lg:text-xl print:text-2xl leading-relaxed print:leading-relaxed text-foreground break-words overflow-wrap-anywhere max-w-full">
-            {letter.split('\n').map((line, index) => {
+          <div className="text-base md:text-lg lg:text-xl print:text-2xl leading-relaxed print:leading-relaxed text-foreground break-words overflow-wrap-anywhere max-w-full">
+            {letter.split('\n').filter(line => line.trim() !== '' && !line.trim().startsWith('P.S.')).map((line, index) => {
               // Check if line is a signature or important line
               const isSantaSignature = line.includes('Santa Claus');
               const isClosing = line.includes('With love') || line.includes('With hope');
-              const isPS = line.startsWith('P.S.');
-              
+
               return (
-                <div key={index}>
+                <div key={index} className="mb-6 print:mb-4 last:mb-0">
                   {/* Add signature image before Santa Claus name */}
                   {isSantaSignature && (
-                    <div className="flex justify-start mt-4 md:mt-6 print:mt-0.5 mb-1 print:mb-0">
+                    <div className="flex justify-start mb-4 print:mb-4">
                       <Image
                         src="/signature.png"
                         alt="Santa's Signature"
                         width={150}
                         height={60}
-                        className="w-32 md:w-40 print:w-20 h-auto"
+                        className="w-32 md:w-40 print:w-40 h-auto"
                         priority
                       />
                     </div>
                   )}
-                  <p 
-                    className={`break-words overflow-wrap-anywhere max-w-full ${
-                      isSantaSignature ? 'font-bold text-xl md:text-2xl print:text-2xl text-primary' : 
-                      isClosing ? 'font-semibold mt-4 md:mt-6 print:mt-1' :
-                      isPS ? 'text-sm md:text-base print:text-lg italic' : 
-                      ''
-                    }`}
+                  <p
+                    className={`break-words overflow-wrap-anywhere max-w-full ${isSantaSignature ? 'font-bold text-xl md:text-2xl print:text-3xl text-primary' :
+                      isClosing ? 'font-semibold' :
+                        ''
+                      }`}
                   >
-                    {line || '\u00A0'}
+                    {line}
                   </p>
                 </div>
               );
             })}
           </div>
 
-          <Separator className="mt-6 md:mt-8 print:mt-0.5 bg-gradient-to-r from-transparent via-primary to-transparent" />
 
-          {/* Footer Decoration - Compact */}
-          <div className="mt-4 md:mt-6 print:mt-0.5 flex items-center justify-center gap-2 md:gap-4 print:gap-1 text-muted-foreground text-sm md:text-base print:text-sm">
-            <Snowflake className="h-3 w-3 md:h-4 md:w-4 print:h-3 print:w-3" />
-            <span>Delivered with Christmas Magic</span>
-            <Snowflake className="h-3 w-3 md:h-4 md:w-4 print:h-3 print:w-3" />
-          </div>
         </CardContent>
       </Card>
 
